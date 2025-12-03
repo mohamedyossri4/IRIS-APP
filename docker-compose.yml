@@ -1,0 +1,62 @@
+services:
+  oracle-db:
+    image: container-registry.oracle.com/database/express:latest
+    container_name: iris-oracle-db
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PWD=YourStrongPassword123
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    networks:
+      - iris-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: iris-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=oracle-db
+      - DB_PORT=1521
+      - DB_USER=system
+      - DB_PASSWORD=YourStrongPassword123
+      - DB_SERVICE=XEPDB1
+      - JWT_SECRET=supersecretkey-change-in-production
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - oracle-db
+    restart: unless-stopped
+    networks:
+      - iris-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: iris-frontend
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - iris-network
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+volumes:
+  oracle-data:
+    driver: local
+
+networks:
+  iris-network:
+    driver: bridge
