@@ -6,10 +6,10 @@ import { CustomerService } from '../../services/customer.service';
 import { LoadingComponent } from '../../components/loading/loading.component';
 
 @Component({
-    selector: 'app-customers',
-    standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, LoadingComponent],
-    template: `
+  selector: 'app-customers',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, LoadingComponent],
+  template: `
     <div class="page-container">
       <div class="page-header">
         <div>
@@ -30,6 +30,7 @@ import { LoadingComponent } from '../../components/loading/loading.component';
               <th>Name</th>
               <th>Email</th>
               <th>Phone</th>
+              <th>Type</th>
               <th>Tax ID</th>
               <th>Actions</th>
             </tr>
@@ -39,6 +40,11 @@ import { LoadingComponent } from '../../components/loading/loading.component';
               <td>{{ customer.name }}</td>
               <td>{{ customer.email || '-' }}</td>
               <td>{{ customer.phone || '-' }}</td>
+              <td>
+                <span class="badge" [class.badge-primary]="customer.customerType === 'COMPANY'" [class.badge-secondary]="customer.customerType === 'INDIVIDUAL'">
+                  {{ customer.customerType || 'INDIVIDUAL' }}
+                </span>
+              </td>
               <td>{{ customer.taxId || '-' }}</td>
               <td>
                 <button class="btn btn-secondary btn-sm" (click)="editCustomer(customer)">Edit</button>
@@ -46,7 +52,7 @@ import { LoadingComponent } from '../../components/loading/loading.component';
               </td>
             </tr>
             <tr *ngIf="customers.length === 0">
-              <td colspan="5" class="text-center text-muted">No customers found</td>
+              <td colspan="6" class="text-center text-muted">No customers found</td>
             </tr>
           </tbody>
         </table>
@@ -76,6 +82,13 @@ import { LoadingComponent } from '../../components/loading/loading.component';
               <label>Tax ID</label>
               <input type="text" [(ngModel)]="formData.taxId" name="taxId">
             </div>
+            <div class="form-group">
+              <label>Customer Type *</label>
+              <select [(ngModel)]="formData.customerType" name="customerType" required>
+                <option value="INDIVIDUAL">Individual</option>
+                <option value="COMPANY">Company</option>
+              </select>
+            </div>
             <div class="flex gap-2">
               <button type="submit" class="btn btn-primary">Save</button>
               <button type="button" class="btn btn-secondary" (click)="showForm = false">Cancel</button>
@@ -85,7 +98,7 @@ import { LoadingComponent } from '../../components/loading/loading.component';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .page-container {
       padding: var(--spacing-xl);
     }
@@ -132,67 +145,87 @@ import { LoadingComponent } from '../../components/loading/loading.component';
     td button {
       margin-right: var(--spacing-sm);
     }
+
+    .badge {
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-primary {
+      background-color: rgba(220, 38, 38, 0.1);
+      color: var(--primary-red);
+      border: 1px solid var(--primary-red);
+    }
+
+    .badge-secondary {
+      background-color: rgba(107, 114, 128, 0.1);
+      color: var(--text-muted);
+      border: 1px solid var(--border-gray);
+    }
   `]
 })
 export class CustomersComponent implements OnInit {
-    customers: any[] = [];
-    loading = true;
-    showForm = false;
-    editingCustomer: any = null;
-    formData: any = {};
+  customers: any[] = [];
+  loading = true;
+  showForm = false;
+  editingCustomer: any = null;
+  formData: any = {};
 
-    constructor(private customerService: CustomerService) { }
+  constructor(private customerService: CustomerService) { }
 
-    ngOnInit(): void {
-        this.loadCustomers();
-    }
+  ngOnInit(): void {
+    this.loadCustomers();
+  }
 
-    loadCustomers(): void {
-        this.customerService.getAll().subscribe({
-            next: (data) => {
-                this.customers = data;
-                this.loading = false;
-            },
-            error: (err) => {
-                console.error('Error loading customers:', err);
-                this.loading = false;
-            }
-        });
-    }
+  loadCustomers(): void {
+    this.customerService.getAll().subscribe({
+      next: (data) => {
+        this.customers = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error loading customers:', err);
+        this.loading = false;
+      }
+    });
+  }
 
-    editCustomer(customer: any): void {
-        this.editingCustomer = customer;
-        this.formData = { ...customer };
-        this.showForm = true;
-    }
+  editCustomer(customer: any): void {
+    this.editingCustomer = customer;
+    this.formData = { ...customer };
+    this.showForm = true;
+  }
 
-    saveCustomer(): void {
-        if (this.editingCustomer) {
-            this.customerService.update(this.editingCustomer.id, this.formData).subscribe({
-                next: () => {
-                    this.loadCustomers();
-                    this.showForm = false;
-                    this.formData = {};
-                }
-            });
-        } else {
-            this.customerService.create(this.formData).subscribe({
-                next: () => {
-                    this.loadCustomers();
-                    this.showForm = false;
-                    this.formData = {};
-                }
-            });
+  saveCustomer(): void {
+    if (this.editingCustomer) {
+      this.customerService.update(this.editingCustomer.id, this.formData).subscribe({
+        next: () => {
+          this.loadCustomers();
+          this.showForm = false;
+          this.formData = {};
         }
-    }
-
-    deleteCustomer(id: number): void {
-        if (confirm('Are you sure you want to delete this customer?')) {
-            this.customerService.delete(id).subscribe({
-                next: () => {
-                    this.loadCustomers();
-                }
-            });
+      });
+    } else {
+      this.customerService.create(this.formData).subscribe({
+        next: () => {
+          this.loadCustomers();
+          this.showForm = false;
+          this.formData = {};
         }
+      });
     }
+  }
+
+  deleteCustomer(id: number): void {
+    if (confirm('Are you sure you want to delete this customer?')) {
+      this.customerService.delete(id).subscribe({
+        next: () => {
+          this.loadCustomers();
+        }
+      });
+    }
+  }
 }

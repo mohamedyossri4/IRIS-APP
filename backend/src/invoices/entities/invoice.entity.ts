@@ -31,7 +31,10 @@ export class Invoice {
         description: string;
         quantity: number;
         unitPrice: number;
-        total: number;
+        taxPercentage: number; // Tax percentage for this line
+        lineTotal: number; // quantity × unitPrice
+        taxAmount: number; // lineTotal × (taxPercentage / 100)
+        total: number; // lineTotal + taxAmount
     }>;
 
     @Column('decimal', { precision: 10, scale: 2 })
@@ -55,7 +58,7 @@ export class Invoice {
     @Column({ type: 'date', nullable: true })
     dueDate: Date;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'varchar2', length: 4000, nullable: true })
     notes: string;
 
     @Column({ nullable: true })

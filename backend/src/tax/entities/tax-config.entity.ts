@@ -17,7 +17,7 @@ export class TaxConfig {
     @Column({ default: true })
     isActive: boolean;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'varchar2', length: 4000, nullable: true })
     description: string;
 
     @CreateDateColumn()

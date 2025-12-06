@@ -1,5 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
+export enum CustomerType {
+    COMPANY = 'COMPANY',
+    INDIVIDUAL = 'INDIVIDUAL',
+}
+
 @Entity('CUSTOMERS')
 export class Customer {
     @PrimaryGeneratedColumn()
@@ -19,6 +24,12 @@ export class Customer {
 
     @Column({ nullable: true })
     taxId: string; // VAT or Tax ID
+
+    @Column({
+        type: 'varchar',
+        default: CustomerType.INDIVIDUAL,
+    })
+    customerType: CustomerType;
 
     @CreateDateColumn()
     createdAt: Date;

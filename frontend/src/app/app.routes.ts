@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { LoginComponent } from './pages/login/login.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CustomersComponent } from './pages/customers/customers.component';
@@ -13,14 +14,21 @@ import { TaxComponent } from './pages/tax/tax.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
-    { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-    { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-    { path: 'customers', component: CustomersComponent, canActivate: [authGuard] },
-    { path: 'products', component: ProductsComponent, canActivate: [authGuard] },
-    { path: 'quotations', component: QuotationsComponent, canActivate: [authGuard] },
-    { path: 'invoices', component: InvoicesComponent, canActivate: [authGuard] },
-    { path: 'payments', component: PaymentsComponent, canActivate: [authGuard] },
-    { path: 'expenses', component: ExpensesComponent, canActivate: [authGuard] },
-    { path: 'contracts', component: ContractsComponent, canActivate: [authGuard] },
-    { path: 'tax', component: TaxComponent, canActivate: [authGuard] },
+    {
+        path: '',
+        component: MainLayoutComponent,
+        canActivate: [authGuard],
+        children: [
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            { path: 'dashboard', component: DashboardComponent },
+            { path: 'customers', component: CustomersComponent },
+            { path: 'products', component: ProductsComponent },
+            { path: 'quotations', component: QuotationsComponent },
+            { path: 'invoices', component: InvoicesComponent },
+            { path: 'payments', component: PaymentsComponent },
+            { path: 'expenses', component: ExpensesComponent },
+            { path: 'contracts', component: ContractsComponent },
+            { path: 'tax', component: TaxComponent },
+        ]
+    }
 ];

@@ -14,8 +14,32 @@ export class InvoicesService {
 
     async create(createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
         const invoiceNumber = await this.generateInvoiceNumber();
+
+        // Calculate line item totals and tax amounts
+        const calculatedItems = createInvoiceDto.items.map(item => {
+            const lineTotal = item.quantity * item.unitPrice;
+            const taxAmount = lineTotal * (item.taxPercentage / 100);
+            const total = lineTotal + taxAmount;
+
+            return {
+                ...item,
+                lineTotal,
+                taxAmount,
+                total,
+            };
+        });
+
+        // Calculate document totals
+        const subtotal = calculatedItems.reduce((sum, item) => sum + item.lineTotal, 0);
+        const tax = calculatedItems.reduce((sum, item) => sum + item.taxAmount, 0);
+        const total = subtotal + tax;
+
         const invoice = this.invoicesRepository.create({
             ...createInvoiceDto,
+            items: calculatedItems,
+            subtotal,
+            tax,
+            total,
             invoiceNumber,
             status: createInvoiceDto.status || InvoiceStatus.DRAFT,
             paidAmount: 0,

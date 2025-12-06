@@ -36,7 +36,7 @@ export class Payment {
     @Column({ nullable: true })
     reference: string;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'varchar2', length: 4000, nullable: true })
     notes: string;
 
     @CreateDateColumn()

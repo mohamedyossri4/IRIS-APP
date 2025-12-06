@@ -21,7 +21,7 @@ class QuotationItemDto {
 
     @IsNumber()
     @IsNotEmpty()
-    total: number;
+    taxPercentage: number; // Tax percentage for this line item
 }
 
 export class CreateQuotationDto {

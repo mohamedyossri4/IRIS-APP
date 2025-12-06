@@ -36,7 +36,7 @@ export class Expense {
     @Column({ nullable: true })
     receipt: string; // File path or URL
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'varchar2', length: 4000, nullable: true })
     notes: string;
 
     @CreateDateColumn()

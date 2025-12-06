@@ -28,7 +28,7 @@ services:
       - JWT_SECRET=supersecretkey-change-in-production
     volumes:
       - ./backend:/app
-      - /app/node_modules
+      - backend-node-modules:/app/node_modules
     depends_on:
       - oracle-db
     restart: unless-stopped
@@ -55,6 +55,8 @@ services:
 
 volumes:
   oracle-data:
+    driver: local
+  backend-node-modules:
     driver: local
 
 networks:

@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsEmail, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsOptional, IsEnum } from 'class-validator';
+import { CustomerType } from '../entities/customer.entity';
 
 export class CreateCustomerDto {
     @IsString()
@@ -20,4 +21,8 @@ export class CreateCustomerDto {
     @IsString()
     @IsOptional()
     taxId?: string;
+
+    @IsEnum(CustomerType)
+    @IsOptional()
+    customerType?: CustomerType;
 }

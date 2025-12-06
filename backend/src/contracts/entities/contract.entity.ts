@@ -22,7 +22,7 @@ export class Contract {
     @Column()
     title: string;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'varchar2', length: 4000, nullable: true })
     description: string;
 
     @Column({ type: 'date' })
@@ -43,7 +43,7 @@ export class Contract {
     @Column({ type: 'date', nullable: true })
     renewalDate: Date;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'varchar2', length: 4000, nullable: true })
     notes: string;
 
     @CreateDateColumn()
